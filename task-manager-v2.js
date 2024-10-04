@@ -37,7 +37,10 @@ async function createTasksTable() {
       `   CREATE TABLE tasks(
           id INTEGER PRIMARY KEY AUTO_INCREMENT,
           label VARCHAR(255) NOT NULL,
-          status VARCHAR(255) NOT NULL
+          description TEXT NOT NULL,
+          status VARCHAR(255) NOT NULL,
+          created_at DATETIME NOT NULL,
+          updated_at DATETIME NOT NULL
       )`
     );
 
@@ -63,16 +66,19 @@ async function readTasks() {
 }
 
 async function addTask() {
-  rl.question('What do you plan to do ? \n ', (taskName) => {
-    rl.question('Which status is that task ? \n ', (taskStatus) => {
-      try {
-        connection.query(`INSERT INTO tasks (label, status) VALUES (?, ?)`, [taskName, taskStatus]);
+  rl.question('What is your new task label ? \n ', (taskLabel) => {
+    rl.question('Any description for it ? \n ', (taskDescription) => {
+      rl.question('Alright, which status should have this task ? (Todo - In progress - Done)', (taskStatus) => {
+        const currentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        try {
+          connection.query(`INSERT INTO tasks (label, status, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`, [taskLabel, taskStatus, taskDescription, currentDate, currentDate]);
 
-        console.log(`New task successfully added: ${taskName}, ${taskStatus}! \n`);
-        returnToMainMenu();
-      } catch (error) {
-        console.log("An error occured ", error);
-      }
+          console.log(`New task successfully added!\nName: ${taskLabel}\nDescription: ${taskDescription}\nStatus: ${taskStatus}!`);
+          returnToMainMenu();
+        } catch (error) {
+          console.log("An error occured ", error);
+        }
+      })
     });
   });
 }
