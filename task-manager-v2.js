@@ -65,6 +65,15 @@ async function readTasks() {
   }
 }
 
+async function searchTaskByFilter() {
+  rl.question('Which status would you find tasks by ? (Todo - Done - In progress)', async (status) => {
+    console.log(`Here are your tasks with ${status} status: `);
+    const [filteredTask] = await connection.query(`SELECT * FROM tasks WHERE status = ?`, [status]);
+    console.log(filteredTask.forEach((task) => console.log(`Task number: ${task.id} - Label: ${task.label} - Description: ${task.description} - Status: ${task.status}`)));
+    returnToMainMenu();
+  });
+}
+
 async function addTask() {
   rl.question('What is your new task label ? \n ', (taskLabel) => {
     rl.question('Any description for it ? \n ', (taskDescription) => {
@@ -141,27 +150,34 @@ async function taskManager(action) {
       returnToMainMenu();
       break;
     case '2' :
-      await addTask();
+      await searchTaskByFilter();
       break;
     case '3' :
-      await deleteTask();
+      await addTask();
       break;
     case '4' :
-      await updateTask();
+      await deleteTask();
       break;
     case '5' :
+      await updateTask();
+      break;
+    case '6' :
       quit();
       break;
+      default:
+        console.log("Please select a valid option");
+        taskChoices();
   }
 }
 
 async function taskChoices() {
   rl.question('Press: \n' +
     '1. To see all your tasks \n'
-    + '2. To add a task \n'
-    + '3. To delete a task \n'
-    + '4. To mark a task as done \n'
-    + '5. To Exit the task manager \n', (answer) => {
+    + '2. To search a task by status \n'
+    + '3. To add a task \n'
+    + '4. To delete a task \n'
+    + '5. To mark a task as done \n'
+    + '6. To Exit the task manager \n', (answer) => {
     taskManager(answer);
   });
 }
