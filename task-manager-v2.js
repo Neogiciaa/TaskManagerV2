@@ -1,6 +1,6 @@
 import readline from 'readline';
 import mysql from 'mysql2/promise';
-import dotenv from 'dotenv';
+import dotenv, {parse} from 'dotenv';
 
 dotenv.config();
 
@@ -101,16 +101,17 @@ async function deleteTask() {
   });
 }
 
-function updateTask() {
-  let tasksLength = tasks.length;
-  console.log(`You have ${tasksLength} tasks at the moment :`);
-  console.log(tasks.map(task => task));
+async function updateTask() {
+  const tasks = await readTasks();
 
-  rl.question('Which one would you update status ? \n ', (answer) => {
-    let taskToUpdate = tasks[answer - 1];
-    rl.question('Great, which status would you apply to that task ? \n ', (answer) => {
-      taskToUpdate.status = answer;
-      console.log(`Task ${taskToUpdate.label} status successfully updated.`);
+  rl.question('Which one would you update status ? (Enter task number) \n ', (taskId) => {
+    const taskToUpdateId = parseInt(taskId);
+    const taskToUpdate = tasks.find(task => task.id === taskToUpdateId);
+    rl.question('Great, which status would you apply to that task ? \n ', (newStatus) => {
+
+      connection.query(`UPDATE tasks SET status = ? WHERE id = ?`, [newStatus, taskToUpdateId]);
+
+      console.log(`Task ${taskToUpdate.label} status successfully updated to ${newStatus}.`);
       returnToMainMenu();
     })
   });
