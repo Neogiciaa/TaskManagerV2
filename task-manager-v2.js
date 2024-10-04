@@ -33,11 +33,11 @@ async function checkIfTasksTableExists() {
 
 async function createTasksTable() {
   try {
-    const [ results ] = await connection.query(
+    await connection.query(
       `   CREATE TABLE tasks(
           id INTEGER PRIMARY KEY AUTO_INCREMENT,
           label VARCHAR(255) NOT NULL,
-          status BOOLEAN
+          status VARCHAR(255) NOT NULL
       )`
     );
 
@@ -48,14 +48,13 @@ async function createTasksTable() {
 }
 
 async function readTasks() {
-  const response = await fetch(url);
-  const tasks = await response.json();
+  const [results] = await connection.query(`SELECT * FROM tasks`);
 
-  if (tasks.length === 0) {
+  if (results.length === 0) {
     console.log("No tasks yet, please create one.");
     returnToMainMenu();
   } else {
-    console.log(tasks);
+    results.map(result => console.log(`Task number: ${result.id} - Label: ${result.label} - Status: ${result.status}`));
     returnToMainMenu();
   }
 }
