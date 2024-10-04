@@ -58,9 +58,9 @@ async function readTasks() {
     returnToMainMenu();
   } else {
     const tasks = [];
-    console.log("Here are you current tasks.");
-    results.forEach(result => tasks.push({id: result.id, label: result.label, status: result.status}));
-    tasks.forEach(task => console.log(`${task.id}: ${task.label} (${task.status})`));
+    console.log("Here are your current tasks.");
+    results.forEach(result => tasks.push({id: result.id, label: result.label, description: result.description, status: result.status}));
+    tasks.forEach(task => console.log(`${task.id} -> Label: ${task.label} - Description:${task.description} - Status: ${task.status}`));
     return tasks;
   }
 }
@@ -138,6 +138,7 @@ async function taskManager(action) {
   switch (action) {
     case '1' :
       await readTasks();
+      returnToMainMenu();
       break;
     case '2' :
       await addTask();
