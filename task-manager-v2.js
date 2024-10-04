@@ -59,20 +59,17 @@ async function readTasks() {
   }
 }
 
-function addTask() {
+async function addTask() {
   rl.question('What do you plan to do ? \n ', (taskName) => {
     rl.question('Which status is that task ? \n ', (taskStatus) => {
-      let newTask = {label: `${taskName}`, status: `${taskStatus}`};
-      fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(newTask),
-      })
-        .then(response => response.json())
-        .then(() => {
-          console.log(`New task successfully added: ${taskName}, ${taskStatus}! \n`);
-          returnToMainMenu();
-        })
+      try {
+        connection.query(`INSERT INTO tasks (label, status) VALUES (?, ?)`, [taskName, taskStatus]);
+
+        console.log(`New task successfully added: ${taskName}, ${taskStatus}! \n`);
+        returnToMainMenu();
+      } catch (error) {
+        console.log("An error occured ", error);
+      }
     });
   });
 }
