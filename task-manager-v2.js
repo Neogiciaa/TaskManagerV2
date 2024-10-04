@@ -1,6 +1,6 @@
 import readline from 'readline';
 import mysql from 'mysql2/promise';
-import dotenv, {parse} from 'dotenv';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
