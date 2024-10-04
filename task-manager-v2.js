@@ -23,10 +23,8 @@ async function checkIfTasksTableExists() {
     );
 
     if (results.length === 0) {
-      console.log('TABLE EXIST PAS -> CREATE !');
       await createTasksTable();
     }
-    console.log('TABLE EXISTS -> Greeting !');
     await greetings();
   } catch (error) {
     console.log("An error occured ", error);
