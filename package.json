@@ -1,6 +1,7 @@
 {
   "name": "08-01-task-manager",
   "version": "1.0.0",
+  "type": "module",
   "description": "This assignment aims to reinforce the understanding and usage of databases and SQL queries.",
   "main": "task-manager-v2.js",
   "scripts": {
@@ -9,6 +10,8 @@
   "author": "SC",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.5",
+    "mysql2": "^3.11.3",
     "readline-sync": "^1.4.10"
   }
 }
