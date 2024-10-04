@@ -54,8 +54,11 @@ async function readTasks() {
     console.log("No tasks yet, please create one.");
     returnToMainMenu();
   } else {
-    results.map(result => console.log(`Task number: ${result.id} - Label: ${result.label} - Status: ${result.status}`));
-    returnToMainMenu();
+    const tasks = [];
+    console.log("Here are you current tasks.");
+    results.forEach(result => tasks.push({id: result.id, label: result.label, status: result.status}));
+    tasks.forEach(task => console.log(`${task.id}: ${task.label} (${task.status})`));
+    return tasks;
   }
 }
 
@@ -74,38 +77,28 @@ async function addTask() {
   });
 }
 
-function deleteTask() {
-  fetch(url)
-    .then(response => response.json())
-    .then(tasks => {
-      let tasksLength = tasks.length;
-      console.log(`You have ${tasksLength} tasks at the moment :`);
-      tasks.forEach((task, index) => {
-        console.log(`${index + 1}. ${task.label}`);
-      });
+async function deleteTask() {
+  const tasks = await readTasks();
 
-      rl.question('Which one would you delete? (Enter task number) \n', (answer) => {
-        let taskIndex = answer - 1;
-        let taskToDelete = tasks[taskIndex];
-        console.log(`Trying to delete task with ID: ${taskToDelete.id}`);
+  rl.question('Which one would you delete? (Enter task number) \n', (taskId) => {
+    const taskToDeleteId = parseInt(taskId);
 
-        fetch(`${url}/${taskToDelete.id}`, {
-          method: 'DELETE'
-        })
-          .then(response => {
-            if (!response.ok) {
-              console.log("Response status:", response.status);
-              throw new Error("Failed to delete the task.");
-            }
-            console.log(`Task "${taskToDelete.label}" successfully deleted.`);
-            returnToMainMenu();
-          })
-          .catch(error => {
-            console.log("Error deleting task:", error.message);
-            returnToMainMenu();
-          });
-      });
-    })
+    const taskToDelete = tasks.find(task => task.id === taskToDeleteId);
+
+    if (!taskToDelete) {
+      console.log("Invalid task ID. Please try again.");
+      return returnToMainMenu();
+    }
+
+    try {
+      connection.query(`DELETE FROM tasks WHERE id = ?`, [taskToDelete.id]);
+      console.log(`Task "${taskToDelete.label}" successfully deleted.`);
+    } catch (error) {
+      console.log("Error deleting task:", error.message);
+    }
+
+    returnToMainMenu();
+  });
 }
 
 function updateTask() {
