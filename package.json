@@ -1,0 +1,14 @@
+{
+  "name": "08-01-task-manager",
+  "version": "1.0.0",
+  "description": "This assignment aims to reinforce the understanding and usage of databases and SQL queries.",
+  "main": "task-manager-v2.js",
+  "scripts": {
+    "start": "node task-manager-v2.js"
+  },
+  "author": "SC",
+  "license": "ISC",
+  "dependencies": {
+    "readline-sync": "^1.4.10"
+  }
+}
