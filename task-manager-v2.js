@@ -91,6 +91,13 @@ async function filterByPriority() {
   returnToMainMenu();
 }
 
+async function filterByCreationDate() {
+  const [results] = await connection.query(`SELECT * FROM tasks ORDER BY created_at`);
+  console.log("Here are your tasks filtered by recent creation date: ");
+  console.log(results.forEach((task) => console.log(`Task number: ${task.id} - Label: ${task.label} - Description: ${task.description} - Status: ${task.status} - Priority: ${task.priority}`)));
+  returnToMainMenu();
+}
+
 async function addTask() {
   rl.question('What is your new task label ? \n ', (taskLabel) => {
     rl.question('Any description for it ? \n ', (taskDescription) => {
@@ -177,16 +184,19 @@ async function taskManager(action) {
     case '4':
       await filterByPriority();
       break;
-    case '5' :
-      await addTask();
+    case '5':
+      await filterByCreationDate();
       break;
     case '6' :
-      await deleteTask();
+      await addTask();
       break;
     case '7' :
-      await updateTask();
+      await deleteTask();
       break;
     case '8' :
+      await updateTask();
+      break;
+    case '9' :
       quit();
       break;
       default:
@@ -201,10 +211,11 @@ async function taskChoices() {
     + '2. To search a task by status \n'
     + '3. To search a task by his description keywords \n'
     + '4. To filter tasks by priority \n'
-    + '5. To add a task \n'
-    + '6. To delete a task \n'
-    + '7. To mark a task as done \n'
-    + '8. To Exit the task manager \n', (answer) => {
+    + '5. To filter tasks by creation date \n'
+    + '6. To add a task \n'
+    + '7. To delete a task \n'
+    + '8. To mark a task as done \n'
+    + '9. To Exit the task manager \n', (answer) => {
     taskManager(answer);
   });
 }
