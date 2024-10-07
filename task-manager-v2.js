@@ -7,14 +7,14 @@ dotenv.config();
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
-});
+})
 
 const connection = await mysql.createConnection({
   host: process.env.DATABASE_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-});
+})
 
 async function checkIfTasksTableExists() {
   try {
@@ -68,10 +68,19 @@ async function readTasks() {
 async function searchTaskByFilter() {
   rl.question('Which status would you find tasks by ? (Todo - Done - In progress)', async (status) => {
     console.log(`Here are your tasks with ${status} status: `);
-    const [filteredTask] = await connection.query(`SELECT * FROM tasks WHERE status = ?`, [status]);
-    console.log(filteredTask.forEach((task) => console.log(`Task number: ${task.id} - Label: ${task.label} - Description: ${task.description} - Status: ${task.status}`)));
+    const [filteredTasks] = await connection.query(`SELECT * FROM tasks WHERE status = ?`, [status]);
+    console.log(filteredTasks.forEach((task) => console.log(`Task number: ${task.id} - Label: ${task.label} - Description: ${task.description} - Status: ${task.status}`)));
     returnToMainMenu();
   });
+}
+
+async function searchByKeywordInDescription() {
+  rl.question('Which keyword would you like to filter by ? ', async (keyword) => {
+    console.log(keyword)
+    const [filteredTasks] = await connection.query(`SELECT * FROM tasks WHERE description LIKE ?`, `%${[keyword]}%`);
+    console.log(filteredTasks.forEach((task) => console.log(`Task number: ${task.id} - Label: ${task.label} - Description: ${task.description} - Status: ${task.status}`)));
+    returnToMainMenu();
+  })
 }
 
 async function addTask() {
@@ -152,16 +161,19 @@ async function taskManager(action) {
     case '2' :
       await searchTaskByFilter();
       break;
-    case '3' :
-      await addTask();
+    case '3':
+      await searchByKeywordInDescription();
       break;
     case '4' :
-      await deleteTask();
+      await addTask();
       break;
     case '5' :
-      await updateTask();
+      await deleteTask();
       break;
     case '6' :
+      await updateTask();
+      break;
+    case '7' :
       quit();
       break;
       default:
@@ -174,10 +186,11 @@ async function taskChoices() {
   rl.question('Press: \n' +
     '1. To see all your tasks \n'
     + '2. To search a task by status \n'
-    + '3. To add a task \n'
-    + '4. To delete a task \n'
-    + '5. To mark a task as done \n'
-    + '6. To Exit the task manager \n', (answer) => {
+    + '3. To search a task by his description keywords \n'
+    + '4. To add a task \n'
+    + '5. To delete a task \n'
+    + '6. To mark a task as done \n'
+    + '7. To Exit the task manager \n', (answer) => {
     taskManager(answer);
   });
 }
