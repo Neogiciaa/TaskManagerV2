@@ -2,7 +2,12 @@
 
 ## Installation
 
-You will need to create a MariaDB or Mysql database in local(you can use Docker to externalize it if wanted) first.
+First step will be to install project dependencies with:
+```bash
+yarn install
+```
+
+After this, you will need to create a MariaDB or Mysql database in local(you can use Docker to externalize it if wanted) first.
 
 ```bash
 CREATE database task_manager;
