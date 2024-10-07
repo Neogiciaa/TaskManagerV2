@@ -167,6 +167,7 @@ function returnToMainMenu() {
 function quit() {
   console.log("See you later ! \n");
   rl.close();
+  connection.end();
 }
 
 async function taskManager(action) {
