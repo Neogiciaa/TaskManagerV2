@@ -32,9 +32,9 @@ In My Pro Task Manager, you will be able to:
 - Delete tasks
 - Search tasks by status
 - Search tasks by keyword included in description
+- Filter tasks by priority
 
 # Coming soon
-- Filter tasks by priority
 - Order tasks by creation/update date
 
 ## Author
