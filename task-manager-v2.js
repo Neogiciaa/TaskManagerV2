@@ -38,6 +38,7 @@ async function createTasksTable() {
           id INTEGER PRIMARY KEY AUTO_INCREMENT,
           label VARCHAR(255) NOT NULL,
           description TEXT NOT NULL,
+          priority    Int  NOT NULL,
           status VARCHAR(255) NOT NULL,
           created_at DATETIME NOT NULL,
           updated_at DATETIME NOT NULL
@@ -59,8 +60,8 @@ async function readTasks() {
   } else {
     const tasks = [];
     console.log("Here are your current tasks.");
-    results.forEach(result => tasks.push({id: result.id, label: result.label, description: result.description, status: result.status}));
-    tasks.forEach(task => console.log(`${task.id} -> Label: ${task.label} - Description:${task.description} - Status: ${task.status}`));
+    results.forEach(result => tasks.push({id: result.id, label: result.label, description: result.description, status: result.status, priority: result.priority }));
+    tasks.forEach(task => console.log(`${task.id} -> Label: ${task.label} - Description:${task.description} - Status: ${task.status} - Priority: ${task.priority}`));
     return tasks;
   }
 }
@@ -69,7 +70,7 @@ async function searchTaskByFilter() {
   rl.question('Which status would you find tasks by ? (Todo - Done - In progress)', async (status) => {
     console.log(`Here are your tasks with ${status} status: `);
     const [filteredTasks] = await connection.query(`SELECT * FROM tasks WHERE status = ?`, [status]);
-    console.log(filteredTasks.forEach((task) => console.log(`Task number: ${task.id} - Label: ${task.label} - Description: ${task.description} - Status: ${task.status}`)));
+    console.log(filteredTasks.forEach((task) => console.log(`Task number: ${task.id} - Label: ${task.label} - Description: ${task.description} - Status: ${task.status} - Priority: ${task.priority}`)));
     returnToMainMenu();
   });
 }
@@ -83,19 +84,28 @@ async function searchByKeywordInDescription() {
   })
 }
 
+async function filterByPriority() {
+  const [results] = await connection.query(`SELECT * FROM tasks ORDER BY priority DESC`);
+  console.log("Here are your tasks filtered by top priority: ");
+  console.log(results.forEach((task) => console.log(`Task number: ${task.id} - Label: ${task.label} - Description: ${task.description} - Status: ${task.status} - Priority: ${task.priority}`)));
+  returnToMainMenu();
+}
+
 async function addTask() {
   rl.question('What is your new task label ? \n ', (taskLabel) => {
     rl.question('Any description for it ? \n ', (taskDescription) => {
       rl.question('Alright, which status should have this task ? (Todo - In progress - Done)', (taskStatus) => {
-        const currentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
-        try {
-          connection.query(`INSERT INTO tasks (label, status, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`, [taskLabel, taskStatus, taskDescription, currentDate, currentDate]);
+        rl.question('Give a priority indicator to your task ! ', (priority) => {
+          const currentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+          try {
+            connection.query(`INSERT INTO tasks (label, status, description, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`, [taskLabel, taskStatus, taskDescription, priority, currentDate, currentDate]);
 
-          console.log(`New task successfully added!\nName: ${taskLabel}\nDescription: ${taskDescription}\nStatus: ${taskStatus}!`);
-          returnToMainMenu();
-        } catch (error) {
-          console.log("An error occured ", error);
-        }
+            console.log(`New task successfully added!\nName: ${taskLabel}\nDescription: ${taskDescription}\nStatus: ${taskStatus}\nPriority: ${priority}!`);
+            returnToMainMenu();
+          } catch (error) {
+            console.log("An error occured ", error);
+          }
+        })
       })
     });
   });
@@ -164,16 +174,19 @@ async function taskManager(action) {
     case '3':
       await searchByKeywordInDescription();
       break;
-    case '4' :
-      await addTask();
+    case '4':
+      await filterByPriority();
       break;
     case '5' :
-      await deleteTask();
+      await addTask();
       break;
     case '6' :
-      await updateTask();
+      await deleteTask();
       break;
     case '7' :
+      await updateTask();
+      break;
+    case '8' :
       quit();
       break;
       default:
@@ -187,10 +200,11 @@ async function taskChoices() {
     '1. To see all your tasks \n'
     + '2. To search a task by status \n'
     + '3. To search a task by his description keywords \n'
-    + '4. To add a task \n'
-    + '5. To delete a task \n'
-    + '6. To mark a task as done \n'
-    + '7. To Exit the task manager \n', (answer) => {
+    + '4. To filter tasks by priority \n'
+    + '5. To add a task \n'
+    + '6. To delete a task \n'
+    + '7. To mark a task as done \n'
+    + '8. To Exit the task manager \n', (answer) => {
     taskManager(answer);
   });
 }
